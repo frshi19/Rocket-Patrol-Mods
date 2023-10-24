@@ -7,6 +7,7 @@ class Play extends Phaser.Scene {
         // load images/tile sprites
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
+        this.load.image('supership', './assets/supership.png');
         this.load.image('starfield', './assets/starfield.png');
         this.load.image('asteroids', './assets/asteroids.png');
         this.load.image('city', './assets/city.png');
@@ -48,9 +49,18 @@ class Play extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
         // add spaceships (x3)
-        this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 4, 'spaceship', 0, 30, 3000).setOrigin(0, 0);
-        this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 5 + borderPadding * 2, 'spaceship', 0, 20, 2000).setOrigin(0,0);
+        this.ship01 = new Spaceship(this, game.config.width + borderUISize * 6, borderUISize * 4, 'spaceship', 0, 30, 2000).setOrigin(0, 0);
+        this.ship02 = new Spaceship(this, game.config.width + borderUISize * 3, borderUISize * 5 + borderPadding * 2, 'spaceship', 0, 20, 1000).setOrigin(0,0);
         this.ship03 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 4, 'spaceship', 0, 10, 1000).setOrigin(0,0);
+
+        // add supership
+        this.ship04 = new Spaceship(this, game.config.width, borderUISize * 6 + borderPadding * 8, 'supership', 0, 40, 0).setOrigin(0,0);
+        if (game.settings.spaceshipSpeed == 3){
+            this.ship04.moveSpeed += 1
+        }else{
+            this.ship04.moveSpeed += 2
+        }
+        
 
         // animation config
         this.anims.create({
@@ -119,6 +129,7 @@ class Play extends Phaser.Scene {
             this.ship01.moveSpeed += 3;
             this.ship02.moveSpeed += 2;
             this.ship03.moveSpeed += 1;
+            this.ship04.moveSpeed += 4;
         }, null, this);
 
         // lower timer
@@ -168,6 +179,7 @@ class Play extends Phaser.Scene {
             this.ship01.update();               // update spaceships (x3)
             this.ship02.update();
             this.ship03.update();
+            this.ship04.update();
         }
 
         // fire mod
@@ -189,6 +201,10 @@ class Play extends Phaser.Scene {
         if (this.checkCollision(this.p1Rocket, this.ship01)) {
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
+        }
+        if (this.checkCollision(this.p1Rocket, this.ship04)) {
+            this.p1Rocket.reset();
+            this.shipExplode(this.ship04);
         }
     }
 
