@@ -8,12 +8,26 @@ class Play extends Phaser.Scene {
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('starfield', './assets/starfield.png');
+        this.load.image('asteroids', './assets/asteroids.png');
+        this.load.image('city', './assets/city.png');
         this.load.spritesheet('explosion','./assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
+        this.load.audio('bgm','./assets/bgm.wav')        
     }
 
     create(){
+        // play music
+        let bgmConfig = {
+            volume: 0.2,
+            loop: true
+        }
+
+        this.bgm = this.sound.add('bgm', bgmConfig);
+        this.bgm.play()
+
         // place tile sprite
-        this.startfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0,0);
+        this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0,0);
+        this.asteroids = this.add.tileSprite(0, 0, 640, 480, 'asteroids').setOrigin(0,0);
+        this.city = this.add.tileSprite(0, 0, 640, 480, 'city').setOrigin(0,0);
 
 
         // green UI background
@@ -62,6 +76,22 @@ class Play extends Phaser.Scene {
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding * 2, this.p1Score, scoreConfig);
 
+        //display fire
+        let fireConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#F3B141',
+            color: '#843605',
+            align: 'center',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100
+        }
+        this.fire = this.add.text(game.config.width/2, borderUISize + borderPadding * 2, 'FIRE', fireConfig);
+        this.fire.alpha = 0;
+
         // GAME OVER flag
         this.gameOver = false;
         // 60-second play clock
@@ -71,29 +101,47 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
+
+        // 30-second speed increase
+        this.clock = this.time.delayedCall(30000, () => {
+            this.ship01.moveSpeed += 3;
+            this.ship02.moveSpeed += 2;
+            this.ship03.moveSpeed += 1;
+        }, null, this);
     }
 
     update(){
         // check key input for restart
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
             this.sound.play('sfx_select');
+            this.bgm.stop();
             this.anims.remove('explode');
             this.scene.restart();
         }
 
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             this.sound.play('sfx_select');
+            this.bgm.stop();
             this.anims.remove('explode');
             this.scene.start('menuScene');
         }
 
-        this.startfield.tilePositionX -=4;
+        this.starfield.tilePositionX -= 0.5;
+        this.asteroids.tilePositionX -= 1;
+        this.city.tilePositionX -= 4;
 
         if(!this.gameOver){
             this.p1Rocket.update();             // update rocket sprite
             this.ship01.update();               // update spaceships (x3)
             this.ship02.update();
             this.ship03.update();
+        }
+
+        // fire mod
+        if (this.p1Rocket.isFiring) {
+            this.fire.alpha = 1;
+        }else{
+            this.fire.alpha = 0;
         }
         
         //check collisions
