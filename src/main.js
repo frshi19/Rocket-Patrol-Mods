@@ -10,6 +10,9 @@
 // Implement parallax scrolling for the background (3)
 // Create a new enemy Spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (5)
 // Implement a new timing/scoring mechanism that adds time to the clock for successful hits (5)
+//
+// Citations:
+// Looped Timer: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/timer/
 
 let config = {
     type: Phaser.CANVAS,
@@ -17,6 +20,8 @@ let config = {
     height: 480,
     scene: [ Menu, Play]
 }
+
+let scoreConfig
 
 let game = new Phaser.Game(config);
 
